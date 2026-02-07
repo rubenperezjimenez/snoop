@@ -11,3 +11,9 @@ dependencies = []
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+	"flake8>=4.0",
+	"pytest>=7.0"
+]
