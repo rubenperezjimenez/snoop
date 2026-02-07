@@ -6,7 +6,11 @@ authors = [ { name = "Ruben Perez", email = "you@example.com" } ]
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+	"fastapi>=0.104.0",
+	"uvicorn[standard]>=0.24.0",
+	"pydantic>=2.0"
+]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .operation-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .operation-btn {
+            padding: 12px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .operation-btn:hover {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .operation-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 2px solid #e8e8e8;
+        }
+
+        .result-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: 700;
+            word-break: break-all;
+        }
+
+        .calculation-details {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #777;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #c33;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #3c3;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Calculator</h1>
+
+        <div class="input-group">
+            <label for="numberA">First Number (a)</label>
+            <input type="number" id="numberA" placeholder="Enter first number" step="any">
+        </div>
+
+        <div class="input-group">
+            <label>Operation</label>
+            <div class="operation-group">
+                <button class="operation-btn active" data-op="add">+ Add</button>
+                <button class="operation-btn" data-op="subtract">− Subtract</button>
+                <button class="operation-btn" data-op="multiply">× Multiply</button>
+                <button class="operation-btn" data-op="divide">÷ Divide</button>
+                <button class="operation-btn" data-op="power" style="grid-column: 1;">^ Power</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="numberB">Second Number (b)</label>
+            <input type="number" id="numberB" placeholder="Enter second number" step="any">
+        </div>
+
+        <button class="calculate-btn" id="calculateBtn">Calculate</button>
+
+        <div id="resultContainer"></div>
+    </div>
+
+    <script>
+        let selectedOperation = "add";
+
+        // Operation button selection
+        document.querySelectorAll('.operation-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.operation-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedOperation = btn.dataset.op;
+            });
+        });
+
+        // Calculate button
+        document.getElementById('calculateBtn').addEventListener('click', async () => {
+            const a = parseFloat(document.getElementById('numberA').value);
+            const b = parseFloat(document.getElementById('numberB').value);
+            const resultContainer = document.getElementById('resultContainer');
+
+            if (isNaN(a) || isNaN(b)) {
+                resultContainer.innerHTML = '<div class="error">⚠ Please enter both numbers</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/calc', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        a,
+                        b,
+                        operation: selectedOperation
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    resultContainer.innerHTML = `<div class="error">⚠ ${error.detail}</div>`;
+                    return;
+                }
+
+                const data = await response.json();
+                const opSymbols = {
+                    'add': '+',
+                    'subtract': '−',
+                    'multiply': '×',
+                    'divide': '÷',
+                    'power': '^'
+                };
+
+                resultContainer.innerHTML = `
+                    <div class="result-section">
+                        <div class="result-label">Result</div>
+                        <div class="result-value">${data.result}</div>
+                        <div class="calculation-details">
+                            ${data.a} ${opSymbols[data.operation]} ${data.b} = ${data.result}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultContainer.innerHTML = `<div class="error">⚠ Error: ${error.message}</div>`;
+            }
+        });
+
+        // Allow Enter key to calculate
+        document.getElementById('numberB').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('calculateBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
